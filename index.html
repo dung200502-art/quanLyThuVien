@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản Lý Thư Viện (Full Features)</title>
+    <title>Quản Lý Thư Viện (Full Pro)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* --- CSS STYLES GIỮ NGUYÊN --- */
+        /* --- CSS STYLES (GIỮ NGUYÊN) --- */
         :root { --primary: #2c3e50; --accent: #3498db; --bg: #f4f6f9; --text: #333; --white: #fff; --danger: #e74c3c; --success: #27ae60; --warning: #f1c40f; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { display: flex; height: 100vh; background: var(--bg); color: var(--text); }
@@ -16,7 +16,6 @@
         .menu { list-style: none; margin-top: 20px; flex: 1; }
         .menu a { display: block; padding: 15px 25px; color: #bdc3c7; text-decoration: none; cursor: pointer; transition: 0.2s; border-left: 4px solid transparent; }
         .menu a:hover, .menu a.active { background: #34495e; color: var(--white); border-left-color: var(--accent); }
-        .menu i { width: 30px; }
         .menu-spacer { flex: 1; }
 
         .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
@@ -232,7 +231,8 @@
     <div id="bookModal" class="modal">
         <div class="modal-content">
             <h3 id="bookModalTitle">Thêm Sách</h3>
-            <input type="hidden" id="bookIdHidden"> <div class="form-grid">
+            <input type="hidden" id="bookIdHidden">
+            <div class="form-grid">
                 <div class="form-group"><label>Mã Sách</label><input type="text" id="mBookId"></div>
                 <div class="form-group"><label>Tên Sách</label><input type="text" id="mBookName"></div>
                 <div class="form-group"><label>Thể Loại</label><input type="text" id="mBookCat"></div>
@@ -250,7 +250,7 @@
     <div id="readerModal" class="modal">
         <div class="modal-content">
             <h3 id="readerModalTitle">Thêm Độc Giả</h3>
-            <div class="form-grid">
+            <input type="hidden" id="readerIdHidden"> <div class="form-grid">
                 <div class="form-group"><label>Mã SV</label><input type="text" id="mReadId"></div>
                 <div class="form-group"><label>Họ Tên</label><input type="text" id="mReadName"></div>
                 <div class="form-group"><label>Lớp</label><input type="text" id="mReadClass"></div>
@@ -322,7 +322,7 @@
             });
         }
 
-        // --- QUẢN LÝ SÁCH (Cập nhật Sửa Sách) ---
+        // --- QUẢN LÝ SÁCH ---
         function renderBooks() {
             const tbody = document.getElementById('bookTableBody');
             const term = document.getElementById('searchBook').value.toLowerCase();
@@ -332,50 +332,37 @@
                     <tr>
                         <td>${b.id}</td><td><b>${b.name}</b></td><td>${b.cat}</td><td>${b.auth}</td>
                         <td>${b.qty}</td><td>${b.price.toLocaleString()}</td>
-                        <td>
-                            <button class="btn btn-warning btn-sm" onclick="editBook('${b.id}')"><i class="fas fa-edit"></i> Sửa</button>
-                        </td>
+                        <td><button class="btn btn-warning btn-sm" onclick="editBook('${b.id}')"><i class="fas fa-edit"></i></button></td>
                     </tr>`;
             });
             updateDashboard();
         }
-
-        // Mở Modal để THÊM mới
         function openBookModal() { 
             document.getElementById('bookModal').classList.add('open');
             document.getElementById('bookModalTitle').innerText = "Thêm Sách Mới";
-            document.getElementById('bookIdHidden').value = ""; // Xóa hidden ID
-            
-            // Xóa trắng form
+            document.getElementById('bookIdHidden').value = "";
             document.getElementById('mBookId').value = "";
-            document.getElementById('mBookId').disabled = false; // Cho phép nhập ID mới
+            document.getElementById('mBookId').disabled = false;
             document.getElementById('mBookName').value = "";
             document.getElementById('mBookCat').value = "";
             document.getElementById('mBookAuth').value = "";
             document.getElementById('mBookQty').value = "";
             document.getElementById('mBookPrice').value = "";
         }
-
-        // Mở Modal để SỬA
         function editBook(id) {
             const b = books.find(x => x.id === id);
             if(!b) return;
-
             document.getElementById('bookModal').classList.add('open');
-            document.getElementById('bookModalTitle').innerText = "Cập nhật thông tin sách";
-            document.getElementById('bookIdHidden').value = id; // Lưu ID đang sửa
-
-            // Điền dữ liệu cũ
+            document.getElementById('bookModalTitle').innerText = "Cập nhật sách";
+            document.getElementById('bookIdHidden').value = id;
             document.getElementById('mBookId').value = b.id;
-            document.getElementById('mBookId').disabled = true; // Không cho sửa ID
+            document.getElementById('mBookId').disabled = true;
             document.getElementById('mBookName').value = b.name;
             document.getElementById('mBookCat').value = b.cat;
             document.getElementById('mBookAuth').value = b.auth;
             document.getElementById('mBookQty').value = b.qty;
             document.getElementById('mBookPrice').value = b.price;
         }
-
-        // Lưu (Xử lý cả Thêm & Sửa)
         function saveBook() {
             const id = document.getElementById('mBookId').value;
             const name = document.getElementById('mBookName').value;
@@ -384,42 +371,111 @@
             const qty = parseInt(document.getElementById('mBookQty').value);
             const price = parseInt(document.getElementById('mBookPrice').value);
             const hiddenId = document.getElementById('bookIdHidden').value;
-
-            if(!id || !name) return alert("Vui lòng nhập đủ Mã và Tên sách");
-
-            const newBookObj = { id, name, cat, auth, qty, price };
-
+            if(!id || !name) return alert("Vui lòng nhập đủ thông tin");
+            const newBook = { id, name, cat, auth, qty, price };
             if(hiddenId) {
-                // Đang ở chế độ SỬA
-                const index = books.findIndex(b => b.id === hiddenId);
-                if(index !== -1) {
-                    books[index] = newBookObj;
-                    alert("Cập nhật thành công!");
-                }
+                const idx = books.findIndex(b => b.id === hiddenId);
+                if(idx !== -1) books[idx] = newBook;
             } else {
-                // Đang ở chế độ THÊM
                 if(books.find(b => b.id === id)) return alert("Mã sách đã tồn tại!");
-                books.push(newBookObj);
-                alert("Thêm mới thành công!");
+                books.push(newBook);
             }
-
-            closeModal('bookModal'); 
-            renderBooks();
+            closeModal('bookModal'); renderBooks();
         }
 
+        // --- QUẢN LÝ ĐỘC GIẢ (NEW: SỬA & XÓA) ---
         function renderReaders() {
             const tbody = document.getElementById('readerTableBody');
             const term = document.getElementById('searchReader').value.toLowerCase();
             tbody.innerHTML = '';
             readers.filter(r => r.name.toLowerCase().includes(term) || r.id.toLowerCase().includes(term)).forEach(r => {
-                tbody.innerHTML += `<tr><td>${r.id}</td><td>${r.name}</td><td>${r.class}</td><td>${r.dept}</td><td>${r.phone}</td><td><button class="btn btn-warning btn-sm" onclick="alert('Tính năng sửa độc giả tương tự sửa sách')"><i class="fas fa-edit"></i></button></td></tr>`;
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${r.id}</td><td>${r.name}</td><td>${r.class}</td><td>${r.dept}</td><td>${r.phone}</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="editReader('${r.id}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteReader('${r.id}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>`;
             });
             updateDashboard();
         }
-        function openReaderModal() { document.getElementById('readerModal').classList.add('open'); }
+
+        function openReaderModal() { 
+            document.getElementById('readerModal').classList.add('open'); 
+            document.getElementById('readerModalTitle').innerText = "Thêm Độc Giả";
+            document.getElementById('readerIdHidden').value = ""; // Clear ID
+            
+            // Clear form
+            document.getElementById('mReadId').value = "";
+            document.getElementById('mReadId').disabled = false; // Cho nhập ID mới
+            document.getElementById('mReadName').value = "";
+            document.getElementById('mReadClass').value = "";
+            document.getElementById('mReadDept').value = "";
+            document.getElementById('mReadPhone').value = "";
+        }
+
+        function editReader(id) {
+            const r = readers.find(x => x.id === id);
+            if(!r) return;
+
+            document.getElementById('readerModal').classList.add('open');
+            document.getElementById('readerModalTitle').innerText = "Cập nhật Độc giả";
+            document.getElementById('readerIdHidden').value = id; // Lưu ID đang sửa
+
+            // Điền form
+            document.getElementById('mReadId').value = r.id;
+            document.getElementById('mReadId').disabled = true; // Không cho sửa ID
+            document.getElementById('mReadName').value = r.name;
+            document.getElementById('mReadClass').value = r.class;
+            document.getElementById('mReadDept').value = r.dept;
+            document.getElementById('mReadPhone').value = r.phone;
+        }
+
         function saveReader() {
-            const newR = { id: document.getElementById('mReadId').value, name: document.getElementById('mReadName').value, class: document.getElementById('mReadClass').value, dept: document.getElementById('mReadDept').value, phone: document.getElementById('mReadPhone').value };
-            readers.push(newR); closeModal('readerModal'); renderReaders();
+            const id = document.getElementById('mReadId').value;
+            const name = document.getElementById('mReadName').value;
+            const clss = document.getElementById('mReadClass').value;
+            const dept = document.getElementById('mReadDept').value;
+            const phone = document.getElementById('mReadPhone').value;
+            const hiddenId = document.getElementById('readerIdHidden').value;
+
+            if(!id || !name) return alert("Vui lòng nhập đủ Mã và Tên");
+
+            const newReader = { id: id, name: name, class: clss, dept: dept, phone: phone };
+
+            if(hiddenId) {
+                // SỬA
+                const idx = readers.findIndex(r => r.id === hiddenId);
+                if(idx !== -1) {
+                    readers[idx] = newReader;
+                    alert("Cập nhật độc giả thành công!");
+                }
+            } else {
+                // THÊM MỚI
+                if(readers.find(r => r.id === id)) return alert("Mã độc giả đã tồn tại!");
+                readers.push(newReader);
+                alert("Thêm độc giả thành công!");
+            }
+            
+            closeModal('readerModal'); 
+            renderReaders();
+        }
+
+        function deleteReader(id) {
+            // Kiểm tra xem độc giả có đang mượn sách không
+            const isBorrowing = loans.some(l => l.readerId === id && l.status === 'active');
+            
+            if(isBorrowing) {
+                alert("KHÔNG THỂ XÓA! Độc giả này đang mượn sách chưa trả.");
+                return;
+            }
+
+            if(confirm("Bạn có chắc chắn muốn xóa độc giả " + id + " không?")) {
+                readers = readers.filter(r => r.id !== id);
+                renderReaders();
+                alert("Đã xóa thành công!");
+            }
         }
 
         // --- SEARCH & LOAN ---
@@ -524,4 +580,4 @@
         init();
     </script>
 </body>
-</html>
+</html>        
